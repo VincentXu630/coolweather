@@ -14,13 +14,11 @@ import android.database.sqlite.SQLiteDatabase;
 
 public class CoolWeatherDB {
 
-	public static final String DB_NAME = "cool_weather";
-	
-	public static final int VERSION = 1;
-	
-	private static CoolWeatherDB  coolWeatherDB;
-	
+	public static final String DB_NAME = "cool_weather";	
+	public static final int VERSION = 1;	
+	private static CoolWeatherDB  coolWeatherDB;	
 	private SQLiteDatabase db;
+	
 	
 	private CoolWeatherDB(Context context){
 		CoolWeatherOpenHelper dbHelper = new CoolWeatherOpenHelper(context, DB_NAME, null, VERSION);
@@ -62,7 +60,7 @@ public class CoolWeatherDB {
 		if(city != null){
 			ContentValues values = new ContentValues();
 			values.put("city_name", city.getCityName());
-			values.put("city_code", city.getCiytCode());
+			values.put("city_code", city.getCityCode());
 			values.put("province_id", city.getProvinceId());
 			db.insert("City", null, values);
 		}
