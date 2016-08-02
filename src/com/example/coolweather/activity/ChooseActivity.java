@@ -8,10 +8,14 @@ import com.example.coolweather.db.CoolWeatherDB;
 import com.example.coolweather.model.City;
 import com.example.coolweather.model.County;
 import com.example.coolweather.model.Province;
+import com.example.coolweather.util.HttpCallbackListener;
+import com.example.coolweather.util.HttpUtil;
+import com.example.coolweather.util.Utility;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -19,6 +23,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class ChooseActivity extends Activity{
 	public static final int LEVEL_PROVINCE = 0;
@@ -63,7 +68,7 @@ public class ChooseActivity extends Activity{
 				}
 			}
 		});
-		queryProvinces();
+		queryProvince();
 	}
 	
 	private void queryProvince(){
@@ -114,4 +119,89 @@ public class ChooseActivity extends Activity{
 			queryFromServer(selectedCity.getCityCode(), "country");
 		}
 	}
+	
+	private void queryFromServer(final String code, final String type){
+		String address;
+		if(!TextUtils.isEmpty(code)){
+			address = "http://www.weather.com.cn/data/list3/city" + code + ".xml";
+		}else{
+			address = "http://www.weather.com.cn/data/list3/city.xml";
+		}
+		showProgressDialog();
+		HttpUtil.sendHttpRequest(address, new HttpCallbackListener() {
+			
+			@Override
+			public void onFinish(String response) {
+				// TODO Auto-generated method stub
+				boolean result = false;
+				if ("province".equals(type)){
+					result = Utility.handleProvinceResponse(coolWeatherDB, response);
+				}else if("city".equals(type)){
+					result = Utility.handleCitiesResponse(coolWeatherDB, response, selectedProvince.getId());
+				}else if("county".equals(type)){
+					result = Utility.handleCountiesResponse(coolWeatherDB, response, selectedCity.getId());
+				}
+				if (result){
+					runOnUiThread(new Runnable() {
+						
+						@Override
+						public void run() {
+							// TODO Auto-generated method stub
+							closeProgressDialog();
+							if("province".equals(type)){
+								queryProvince();
+							}else if("city".equals(type)){
+								queryCities();
+							}else if("county".equals(type)){
+								queryCounties();
+							}
+						}
+					});
+				}
+			}
+			
+			@Override
+			public void onError(Exception e) {
+				// TODO Auto-generated method stub
+				runOnUiThread(new Runnable() {
+					
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						closeProgressDialog();
+						Toast.makeText(ChooseActivity.this, "加载失败", Toast.LENGTH_SHORT).show();
+					}
+				});
+			}
+		});
+	}
+	
+	private void showProgressDialog(){
+		if (progressDialog == null){
+			progressDialog = new ProgressDialog(this);
+			progressDialog.setMessage("正在加载。。。");
+			progressDialog.setCanceledOnTouchOutside(false);
+		}
+		progressDialog.show();
+	}
+	
+	private void closeProgressDialog(){
+		if(progressDialog != null){
+			progressDialog.dismiss();
+		}
+	}
+	
+	@Override
+	public void onBackPressed(){
+		if (currentLevel == LEVEL_COUNTY){
+			queryCities();
+		}else if (currentLevel == LEVEL_CITY){
+			queryProvince();
+		}else{
+			finish();
+		}
+	}
+	
+	
 }
+
