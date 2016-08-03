@@ -116,7 +116,7 @@ public class ChooseActivity extends Activity{
 			titleText.setText(selectedCity.getCityName());
 			currentLevel = LEVEL_COUNTY;
 		}else{
-			queryFromServer(selectedCity.getCityCode(), "country");
+			queryFromServer(selectedCity.getCityCode(), "county");
 		}
 	}
 	
