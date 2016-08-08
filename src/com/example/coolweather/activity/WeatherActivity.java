@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -149,6 +150,7 @@ public class WeatherActivity extends Activity implements OnClickListener{
 	private void showWeather(){
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		cityNameText.setText(prefs.getString("city_name", ""));
+		Log.d("coolweater_xu", prefs.getString("city_name", ""));
 		temp1Text.setText(prefs.getString("temp1", ""));
 		temp2Text.setText(prefs.getString("temp2", ""));
 		weatherDespText.setText(prefs.getString("weather_desp", ""));
